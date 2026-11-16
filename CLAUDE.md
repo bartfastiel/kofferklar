@@ -6,7 +6,8 @@ die Packliste. Lieber zu viele Einträge als zu wenige, dafür nach Priorität s
 über „Etwas fehlt?“ nach, und es kommt künftig bei passenden Reisen dazu. Leitlinie: **klein und einfach**, keine
 Laufzeit-Abhängigkeiten. Antworten und Doku auf Deutsch, Code, Kommentare und Commits auf Englisch.
 
-Live unter `kofferklar.wer-ist-daniel-schwarz.de`. Repo privat `bartfastiel/kofferklar`.
+Öffentliches Repo `bartfastiel/kofferklar` unter MIT-Lizenz. Der Hostname gehört nicht ins Repo (keine Links); er steht
+nur in der Server-Konfiguration.
 
 ## Befehle
 
@@ -47,7 +48,7 @@ server/                 app.ts (Anmeldung, Sitzungen, Abgleich), db.ts, seed.ts,
 - Daniels echte Daten nur über die App oder `tools/kk.sh` ändern, nie per SQL. Vor größeren Eingriffen `backup`.
 - Keine Attribution an KI-Werkzeuge, weder in Commits noch in PRs oder Dateien (wie in Daniels anderen Repos; der
   commit-msg-Hook lehnt solche Zeilen ab). Conventional Commits auf Englisch.
-- Keine Links im Repo (pre-commit-Hook). Der Hostname steht nur in dieser Datei.
+- Keine Links im Repo (pre-commit-Hook), keine persönlichen Daten, keine Zugangsdaten. Das Repo ist öffentlich.
 
 ## Hosting
 

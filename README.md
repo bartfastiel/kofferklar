@@ -13,3 +13,5 @@ npm run local   # App mit Backend auf localhost:4180, druckt beim ersten Start e
 npm run check   # Typen, Tests, Build
 npm run e2e     # Playwright im Format des Pixel 6 Pro
 ```
+
+Deployment hinter Caddy: [infra/deploy.md](infra/deploy.md). Lizenz: MIT.

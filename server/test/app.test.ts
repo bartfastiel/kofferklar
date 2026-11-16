@@ -146,3 +146,15 @@ test('starter list: written once into an empty database, never twice, deleted it
   const row = d.prepare("SELECT json FROM records WHERE id = 's-zahnbuerste'").get() as { json: string };
   assert.deepEqual(JSON.parse(row.json).when, [['nacht']]);
 });
+
+test('sign-in attempts without a session are limited per address', async () => {
+  const d = openDb(':memory:');
+  const a = createApp({ db: d, origins: [ORIGIN], rpId: RP, now: () => clock });
+  const srv = createServer((req, res) => void a.handle(req, res));
+  await new Promise<void>((r) => srv.listen(0, '127.0.0.1', () => r()));
+  const url = 'http://127.0.0.1:' + (srv.address() as AddressInfo).port + '/api/auth/login/options';
+  const hit = () => fetch(url, { method: 'POST', headers: { Origin: ORIGIN } }).then((r) => r.status);
+  for (let i = 0; i < 60; i++) assert.equal(await hit(), 200);
+  assert.equal(await hit(), 429);
+  srv.close();
+});

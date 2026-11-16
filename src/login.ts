@@ -1,16 +1,14 @@
 // Sign-in page (/login/): set up a passkey with an invite link, or sign in with a passkey. A small bundle of its own
 // without the rest of the app – without a session only this page is reachable.
+import { safeNext } from './next.ts';
 import { h } from './ui/dom.ts';
 
 const params = new URLSearchParams(location.search);
 const invite = params.get('invite');
-const next = safeNext(params.get('next'));
+const next = safeNext(params.get('next'), location.origin);
 const main = document.getElementById('main') as HTMLElement;
 const status = h('p', { class: 'muted', role: 'status', 'aria-live': 'polite' });
 
-function safeNext(v: string | null): string {
-  return v && v.charAt(0) === '/' && v.charAt(1) !== '/' && v.indexOf('/login') !== 0 ? v : '/';
-}
 
 function bytes(s: string): Uint8Array<ArrayBuffer> {
   const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/'));

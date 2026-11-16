@@ -2,7 +2,7 @@
   "name": "kofferklar",
   "version": "0.1.0",
   "description": "Kofferklar – private packing list PWA: a configurator asks about the trip and builds the list, learning from what was missing.",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "engines": {

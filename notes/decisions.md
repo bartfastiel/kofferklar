@@ -2,7 +2,8 @@
 
 ## 2026-11-16 – Start
 
-- **Name Kofferklar**, Subdomain `kofferklar.wer-ist-daniel-schwarz.de`, Repo privat `bartfastiel/kofferklar` (Daniel).
+- **Name Kofferklar**, eigene Subdomain auf Daniels Server, Repo `bartfastiel/kofferklar` (Daniel). Websuche 2026-11-16: keine App
+  und keine Marke dieses Namens gefunden. Seit 2026-11-16 öffentlich unter MIT (Daniel).
 - **Gerüst wie Liederbuch/Herdgang**: Passkey per Einladung, local-first, keine Laufzeit-Abhängigkeiten. Eine
   Datenbank, keine Mandanten; vorerst nur Daniel.
 - **Regeln statt Vorlagen**: Jeder Gegenstand sagt selbst, wann er gebraucht wird (Tags aus den Antworten, ODER über

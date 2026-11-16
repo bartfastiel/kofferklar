@@ -84,17 +84,31 @@ export function createApp(cfg: Config) {
     return req.socket.remoteAddress || '';
   }
 
-  function limited(ip: string): boolean {
+  const starts = new Map<string, number[]>();
+  const WINDOW = 15 * 60 * 1000;
+
+  /** recent timestamps of one IP; the maps are emptied of stale IPs once they grow, so they stay small */
+  function recent(map: Map<string, number[]>, ip: string): number[] {
     const t = now();
-    const list = (failures.get(ip) || []).filter((x) => t - x < 15 * 60 * 1000);
-    failures.set(ip, list);
-    return list.length >= 20;
+    if (map.size > 5000) for (const [k, v] of map) if (!v.length || t - v[v.length - 1] >= WINDOW) map.delete(k);
+    const list = (map.get(ip) || []).filter((x) => t - x < WINDOW);
+    map.set(ip, list);
+    return list;
+  }
+
+  function limited(ip: string): boolean {
+    return recent(failures, ip).length >= 20;
   }
 
   function fail(ip: string): void {
-    const list = failures.get(ip) || [];
+    recent(failures, ip).push(now());
+  }
+
+  /** sign-in attempts without a session write a challenge each: at most 60 per IP and 15 minutes */
+  function throttleStart(req: IncomingMessage): void {
+    const list = recent(starts, clientIp(req));
+    if (list.length >= 60) throw new HttpError(429, 'rate_limited', 'Zu viele Versuche. Bitte später noch einmal.');
     list.push(now());
-    failures.set(ip, list);
   }
 
   function cookies(req: IncomingMessage): Record<string, string> {
@@ -138,6 +152,9 @@ export function createApp(cfg: Config) {
 
   function newChallenge(kind: string, inviteHash: string | null, userId?: string): { id: string; challenge: string } {
     db.prepare('DELETE FROM challenges WHERE created < ?').run(now() - CHALLENGE_TTL);
+    // overall cap, so many addresses together cannot fill the disk either
+    const open = db.prepare('SELECT count(*) AS n FROM challenges').get() as { n: number };
+    if (open.n >= 1000) throw new HttpError(429, 'rate_limited', 'Gerade zu viele Anmeldungen. Bitte gleich noch einmal.');
     const c = { id: randomUUID(), challenge: token() };
     db.prepare('INSERT INTO challenges (id, challenge, kind, invite_hash, created) VALUES (?, ?, ?, ?, ?)').run(c.id, c.challenge + (userId ? '|' + userId : ''), kind, inviteHash, now());
     return c;
@@ -275,6 +292,7 @@ export function createApp(cfg: Config) {
     },
 
     'POST /api/auth/register/options': async (req, res) => {
+      throttleStart(req);
       const b = await body(req, 64 * 1024);
       const inv = validInvite(b.invite);
       const userId = inv.user_id || randomUUID();
@@ -345,7 +363,8 @@ export function createApp(cfg: Config) {
       json(res, 200, { ok: true });
     },
 
-    'POST /api/auth/login/options': (_req, res) => {
+    'POST /api/auth/login/options': (req, res) => {
+      throttleStart(req);
       const c = newChallenge('login', null);
       json(res, 200, {
         challenge_id: c.id,
