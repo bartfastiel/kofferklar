@@ -158,3 +158,17 @@ test('sign-in attempts without a session are limited per address', async () => {
   assert.equal(await hit(), 429);
   srv.close();
 });
+
+test('a change from the far future does not win forever; removed people lose their open invites', async () => {
+  const ed = await person('Zukunft', 'owner');
+  const future = { ...item('f1', 'Zukunft'), updated: 1e300 };
+  assert.equal((await call('/api/records', { records: [future] }, ed.cookie)).data.accepted, 1);
+  const row = db.prepare("SELECT updated FROM records WHERE id = 'f1'").get() as { updated: number };
+  assert.ok(row.updated <= clock + 86400000);
+  const other = await person('Geht', 'editor');
+  const inv = await call('/api/invites', { user_id: other.id }, ed.cookie);
+  assert.equal(inv.status, 200);
+  await call('/api/members/remove', { user_id: other.id }, ed.cookie);
+  const code = new URL(inv.data.link).searchParams.get('invite');
+  assert.equal((await call('/api/invites/info', { invite: code })).data.error.code, 'invite_invalid');
+});

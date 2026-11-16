@@ -63,6 +63,7 @@ try {
   } else if (cmd === 'user-remove' && args[0]) {
     const id = user(args[0]);
     db.prepare('UPDATE users SET disabled = 1 WHERE id = ?').run(id);
+    db.prepare('DELETE FROM invites WHERE used IS NULL AND (user_id = ? OR created_by = ?)').run(id, id);
     db.prepare('DELETE FROM sessions WHERE user_id = ?').run(id);
     console.log('disabled ' + id);
   } else if (cmd === 'passkey-remove' && args[0]) {

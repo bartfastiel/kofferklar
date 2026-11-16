@@ -106,7 +106,10 @@ export function createApp(cfg: Config) {
 
   /** sign-in attempts without a session write a challenge each: at most 60 per IP and 15 minutes */
   function throttleStart(req: IncomingMessage): void {
-    const list = recent(starts, clientIp(req));
+    // IPv6: one /64 counts as one address (a single host usually has the whole network)
+    const ip = clientIp(req);
+    const key = ip.indexOf(':') >= 0 && ip.indexOf('.') < 0 ? ip.split(':').slice(0, 4).join(':') : ip;
+    const list = recent(starts, key);
     if (list.length >= 60) throw new HttpError(429, 'rate_limited', 'Zu viele Versuche. Bitte später noch einmal.');
     list.push(now());
   }
@@ -286,6 +289,7 @@ export function createApp(cfg: Config) {
       if (b.user_id === s.userId) throw new HttpError(400, 'bad_request', 'Den eigenen Zugang bitte nicht entfernen.');
       const id = String(b.user_id);
       db.prepare('UPDATE users SET disabled = 1 WHERE id = ?').run(id);
+      db.prepare('DELETE FROM invites WHERE used IS NULL AND (user_id = ? OR created_by = ?)').run(id, id);
       db.prepare('DELETE FROM sessions WHERE user_id = ?').run(id);
       audit('member_removed', s.userId, clientIp(req), id);
       json(res, 200, { ok: true });
@@ -448,7 +452,8 @@ export function createApp(cfg: Config) {
           const data = rec.deleted ? null : rec.data === undefined ? null : rec.data;
           const serial = JSON.stringify(data);
           if (serial.length > 256 * 1024) throw new HttpError(413, 'too_large', 'Datensatz zu groß.');
-          const updated = Number(rec.updated) || 0;
+          // a clock far ahead must not win against every later change: at most one day ahead of the server
+          const updated = Math.min(Number.isFinite(Number(rec.updated)) ? Number(rec.updated) : 0, now() + 86400000);
           const old = get.get(rec.store, rec.id) as { json: string; updated: number; deleted: number } | undefined;
           if (old && old.updated > updated) continue;
           if (!mayWrite) {

@@ -1,10 +1,10 @@
 #!/bin/sh
 # Conventional Commits: type(scope)?: description – merge commits are exempt. No attribution to AI tools: no
-# co-author, session or "generated with" lines, no robot emoji, no session links (CLAUDE.md, Daniel).
+# co-author, session or "generated with" lines, no robot emoji, no session links (AGENTS.md, Daniel).
 # the robot emoji is matched byte by byte (grep and UTF-8 are unreliable under Git Bash)
 robot=$(printf '\360\237\244\226')
 if grep -Eiq '^(co-authored-by|[a-z-]*-session):|generated with|claude\.ai/code|noreply@anthropic\.com' "$1" || LC_ALL=C grep -q "$robot" "$1"; then
-  echo "No AI attribution in commit messages (co-author, session, \"generated with\", 🤖) – see CLAUDE.md." >&2
+  echo "No AI attribution in commit messages (co-author, session, \"generated with\", 🤖) – see AGENTS.md." >&2
   exit 1
 fi
 first=$(sed -n '1p' "$1")

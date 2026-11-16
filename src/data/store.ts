@@ -26,6 +26,16 @@ export function useDatabase(server: boolean): void {
   dbPromise = null;
 }
 
+/** removes the local database (signing out on a shared device) */
+export async function wipe(): Promise<void> {
+  if (dbPromise) (await dbPromise).close();
+  dbPromise = null;
+  await new Promise<void>((resolve) => {
+    const req = indexedDB.deleteDatabase(name);
+    req.onsuccess = req.onerror = req.onblocked = () => resolve();
+  });
+}
+
 export function onLocalChange(fn: () => void): void {
   listeners.push(fn);
 }

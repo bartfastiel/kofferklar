@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Builds and deploys the app to the frag-daniel server. Only after Daniel's yes (CLAUDE.md), and only once Caddy,
+# Builds and deploys the app to the frag-daniel server. Only after Daniel's yes (AGENTS.md), and only once Caddy,
 # container and backup are set up in the frag-daniel repository (infra/frag-daniel.md).
 #   tools/deploy.sh            checks (types, tests), build, upload dist/ and dist-server/, restart the backend
 # KK_SSH: ssh host alias (default frag-daniel).

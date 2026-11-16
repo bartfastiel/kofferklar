@@ -1,6 +1,6 @@
 // Sync with the own server (only when signed in, never in previews). Local data leads: the app works offline.
 // Records go up and down through /api/records (newer change wins, deleting as tombstone).
-import { allRaw, applyRemote, getMeta, onLocalChange, setMeta, STORES, useDatabase } from './data/store.ts';
+import { allRaw, applyRemote, getMeta, onLocalChange, setMeta, STORES, useDatabase, wipe } from './data/store.ts';
 import type { Author, Base } from './data/types.ts';
 
 declare const __PREVIEW__: boolean;
@@ -49,6 +49,10 @@ export function onStatus(fn: () => void): void {
 const notify = () => statusListeners.forEach((f) => f());
 
 function toLogin(): void {
+  // without a valid session the app must not keep opening offline as the signed-in person
+  try {
+    localStorage.removeItem(ME_KEY);
+  } catch {}
   location.href = '/login/?next=' + encodeURIComponent(location.pathname + location.hash);
 }
 
@@ -189,5 +193,7 @@ export async function logout(): Promise<void> {
   try {
     localStorage.removeItem(ME_KEY);
   } catch {}
+  // the list stays on the server; the device keeps nothing – unless the last sync failed, then nothing is lost
+  if (!lastError) await wipe();
   location.href = '/login/';
 }

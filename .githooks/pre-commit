@@ -10,7 +10,7 @@ files=$(git diff --cached --name-only --diff-filter=ACM | grep -vE '^package-loc
 media=$(echo "$files" | grep -iE '\.(jpe?g|png|gif|webp|heic|heif|tiff?|bmp|pdf)$' | grep -vE '^public/icon-[0-9]+\.png$' || true)
 if [ -n "$media" ]; then
   echo "$media" >&2
-  echo "No photos, scans or PDFs in the repository – they stay in .local/ (CLAUDE.md)." >&2
+  echo "No photos, scans or PDFs in the repository – they stay in .local/ (AGENTS.md)." >&2
   exit 1
 fi
 # No AI attribution in files either (README, docs, package.json …); this hook itself and the Claude hook are exempt.
@@ -19,7 +19,7 @@ scan=$(echo "$files" | grep -vE '^(\.githooks/|\.claude/hooks/)' || true)
 attr=$( { echo "$scan" | xargs grep -nEi 'co-authored-by: claude|generated with \[?claude|claude\.ai/code' -- 2>/dev/null; echo "$scan" | LC_ALL=C xargs grep -n "$robot" -- 2>/dev/null; } || true)
 if [ -n "$attr" ]; then
   echo "$attr" >&2
-  echo "No AI attribution in the repository (CLAUDE.md)." >&2
+  echo "No AI attribution in the repository (AGENTS.md)." >&2
   exit 1
 fi
 if echo "$files" | xargs grep -nE 'https?://' -- 2>/dev/null | grep -vE 'https?://([$<]|localhost|127\.0\.0\.1|local[/'"'"']|([a-z0-9-]+\.)*example(\.org|\.com)?([^a-z0-9.]|$)|www\.w3\.org/2000/svg)'; then

@@ -1,4 +1,4 @@
-# Kofferklar
+# Kofferklar – Hinweise für Agenten
 
 Daniels private Packliste als PWA (nicht uCORE; uCORE-Regeln gelten hier nicht). Ein Konfigurator fragt nach der Reise
 (Urlaub, Dienstreise, Besuch, Ausflug; Nächte; Anreise; Ziel; Wetter; Vorhaben; Unterkunft; Mitreisende) und baut daraus
