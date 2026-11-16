@@ -1,0 +1,12 @@
+.env
+node_modules/
+cache/
+browser-profile/
+/data/
+dist*/
+test-results/
+playwright-report/
+*.log
+# local data (npm run local) and Daniel's own lists before import: never in the repo
+.local/
+.claude/worktrees/

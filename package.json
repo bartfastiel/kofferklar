@@ -1,0 +1,27 @@
+{
+  "name": "kofferklar",
+  "version": "0.1.0",
+  "description": "Kofferklar – private packing list PWA: a configurator asks about the trip and builds the list, learning from what was missing.",
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "node tools/build.mjs --serve",
+    "local": "node tools/local.mjs",
+    "build": "node tools/build.mjs && node tools/build-server.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"tests/unit/*.test.ts\" \"server/test/*.test.ts\"",
+    "e2e": "npm run build && playwright test",
+    "check": "npm run typecheck && npm test && npm run build",
+    "prepare": "git config core.hooksPath .githooks || true"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "^24.19.1",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}
